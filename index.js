@@ -3,7 +3,8 @@
 module.exports = (config, storage = null) => {
     let storageObject;
     if (typeof storage === 'string' || storage instanceof String) {
-        storageObject = new require(`auzy-storage-${storage}`)(config.storage);
+        const auzyStorage = require(`auzy-storage-${storage}`);
+        storageObject = new auzyStorage(config.storage);
     } else {
         // Object storage is non-persistent storage for sessions
         let objectStorage = new require('./ObjectStorage')(config.storage);

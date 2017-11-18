@@ -5,7 +5,7 @@ module.exports = class ObjectStorage {
         this.data = {};
     }
 
-    set(key, value) {
+    set(key, value, expire = null) {
         this.data[key] = value;
         return Promise.resolve();
     }
@@ -14,8 +14,12 @@ module.exports = class ObjectStorage {
         return Promise.resolve(this.data[key]);
     }
 
-    remove(key) {
-        delete this.data[key];
+    del(key) {
+        try {
+            delete this.data[key];
+        } catch (err) {
+            return Promise.reject(err);
+        }
         return Promise.resolve();
     }
 };

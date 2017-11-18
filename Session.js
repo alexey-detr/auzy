@@ -16,7 +16,7 @@ module.exports = class Session {
         if (this.config.sendSessionId) {
             this.config.sendSessionId(res, this.config.sessionName, this.sessionId);
         }
-        return this.storage.set(this.sessionId, this.sessionData);
+        return this.storage.set(this.sessionId, this.sessionData, this.config.expire);
     }
 
     async loadSession(req) {
@@ -26,8 +26,10 @@ module.exports = class Session {
             this.saveSession();
         }
         this.sessionData = await this.storage.get(this.sessionId);
-        if (this.config.loadUser) {
+        if (this.config.loadUser && this.sessionData) {
             req.user = await this.config.loadUser(this.sessionData);
+        } else if (this.config.loadUser) {
+            req.user = null;
         }
     }
 
@@ -49,6 +51,6 @@ module.exports = class Session {
     }
 
     destroy() {
-        return this.storage.remove(this.sessionId);
+        return this.storage.del(this.sessionId);
     }
 };
