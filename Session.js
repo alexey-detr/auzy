@@ -16,7 +16,7 @@ module.exports = class Session {
         if (this.config.sendSessionId) {
             this.config.sendSessionId(res, this.config.sessionName, this.sessionId);
         }
-        return this.storage.set(this.sessionId, this.sessionData, this.config.expire);
+        return this.storage.set(this.sessionId, this.sessionData, this.config.ttl);
     }
 
     async loadSession(req) {
@@ -33,21 +33,13 @@ module.exports = class Session {
         }
     }
 
-    // sendSessionId(res, sessionName, sessionId) {
-    //     this.res.setHeader(this.config.sessionName, this.sessionId);
-    // }
-    //
-    // loadUser(sessionData) {
-    //
-    // }
-
     generateSessionId() {
         return this.sessionId;
     }
 
     authenticate(sessionData) {
         this.sessionData = sessionData;
-        this.saveSession();
+        return this.saveSession();
     }
 
     destroy() {

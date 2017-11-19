@@ -5,7 +5,10 @@ module.exports = class ObjectStorage {
         this.data = {};
     }
 
-    set(key, value, expire = null) {
+    set(key, value, ttl = null) {
+        if (ttl) {
+            throw new Error('TTL is not supported for non-persistent object storage.');
+        }
         this.data[key] = value;
         return Promise.resolve();
     }

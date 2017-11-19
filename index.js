@@ -7,12 +7,15 @@ module.exports = (config, storage = null) => {
         storageObject = new auzyStorage(config.storage);
     } else {
         // Object storage is non-persistent storage for sessions
-        let objectStorage = new require('./ObjectStorage')(config.storage);
+        const ObjectStorage = require('./ObjectStorage');
+        const objectStorage = new ObjectStorage(config.storage);
         storageObject = storage || objectStorage;
     }
-    const session = new require('./Session')(storageObject, config.session);
+    const Session = require('./Session');
+    const session = new Session(storageObject, config.session);
 
     return async (req, res, next) => {
+        req.session = session;
         await session.loadSession(req);
         next();
     };
