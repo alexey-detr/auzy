@@ -12,7 +12,7 @@ module.exports = class Session {
         this.sessionData = {};
     }
 
-    saveSession() {
+    saveSession(res) {
         if (this.config.sendSessionId) {
             this.config.sendSessionId(res, this.config.sessionName, this.sessionId);
         }
@@ -20,7 +20,9 @@ module.exports = class Session {
     }
 
     async loadSession(req) {
-        this.sessionId = req.getHeader(this.config.sessionName);
+        if (this.config.receiveSessionId) {
+            this.sessionId = this.config.receiveSessionId(req, this.config.sessionName);
+        }
         if (!this.sessionId) {
             this.sessionId = this.generateSessionId();
             this.saveSession();
@@ -37,9 +39,9 @@ module.exports = class Session {
         return this.sessionId;
     }
 
-    authenticate(sessionData) {
+    authenticate(res, sessionData) {
         this.sessionData = sessionData;
-        return this.saveSession();
+        return this.saveSession(res);
     }
 
     destroy() {
