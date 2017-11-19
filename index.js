@@ -11,12 +11,11 @@ module.exports = (config, storage = null) => {
         const objectStorage = new ObjectStorage(config.storage);
         storageObject = storage || objectStorage;
     }
-    const Session = require('./Session');
-    const session = new Session(storageObject, config.session);
+    const SessionRequestHandler = require('./SessionRequestHandler');
 
     return async (req, res, next) => {
-        req.session = session;
-        await session.loadSession(req);
+        req.session = new SessionRequestHandler(req, res, storageObject, config.session);
+        await req.session.loadSession();
         next();
     };
 };
