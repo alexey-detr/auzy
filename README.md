@@ -15,6 +15,6 @@ auzy project was made to be simple. The reason why I started it is a complexity 
 - Flexibility for adding any session backend storages (e.g. Redis, MongoDB)
 - Covered with unit-test (not ready yet)
 
-## Available torages
+## Available storages
 
 - Redis [alexey-detr/auzy-storage-redis](https://github.com/alexey-detr/auzy-storage-redis)
