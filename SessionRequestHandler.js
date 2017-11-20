@@ -19,10 +19,13 @@ module.exports = class SessionRequestHandler {
     }
 
     saveSession() {
+        return this.storage.set(this.sessionId, this.sessionData, this.config.ttl);
+    }
+
+    sendSession() {
         if (this.config.sendSessionId) {
             this.config.sendSessionId(this.res, this.config.sessionName, this.sessionId);
         }
-        return this.storage.set(this.sessionId, this.sessionData, this.config.ttl);
     }
 
     async loadSession() {
@@ -38,8 +41,11 @@ module.exports = class SessionRequestHandler {
         } else if (this.config.loadUser) {
             this.req.user = null;
         }
-        if (this.config.resave) {
+        if (this.config.alwaysSave) {
             this.saveSession();
+        }
+        if (this.config.alwaysSend) {
+            this.sendSession();
         }
     }
 

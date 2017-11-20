@@ -1,6 +1,19 @@
 'use strict';
 
 const SessionRequestHandler = require('../SessionRequestHandler');
+const StorageStub = require('./stubs/StorageStub');
+const getSessionWithStorage = (storage, config) => {
+    const req = {
+        getHeader() {
+            return 'long-session-id';
+        },
+    };
+    const res = {
+        setHeader() {
+        },
+    };
+    return new SessionRequestHandler(req, res, storage, config);
+};
 
 describe('SessionRequestHandler', () => {
     describe('initialization', () => {
@@ -44,20 +57,9 @@ describe('SessionRequestHandler', () => {
     });
 
     describe('loading session', () => {
-        const StorageStub = require('./stubs/StorageStub');
-        const getSessionWithStorage = (storage, config) => {
-            const req = {
-                getHeader() { return 'long-session-id'; }
-            };
-            const res = {
-                setHeader() {}
-            };
-            return new SessionRequestHandler(req, res, storage, config);
-        };
-
         it('should receive sessionId from request if receiveSessionId function specified', async () => {
             const storage = new StorageStub();
-            storage.get = jest.fn().mockImplementation(() => {});
+            storage.get = jest.fn();
             const sessionHandler = getSessionWithStorage(storage, {
                 sessionName: 'X-Session',
                 receiveSessionId: (req, sessionName) => req.getHeader(sessionName),
@@ -66,6 +68,22 @@ describe('SessionRequestHandler', () => {
             expect(storage.get).toHaveBeenCalledTimes(1);
             expect(storage.get).toHaveBeenCalledWith('long-session-id');
             expect(sessionHandler.sessionId).toEqual('long-session-id');
+        });
+
+        it('should send sessionId to client in response if sendSessionId function specified', async () => {
+            const storage = new StorageStub();
+            const sessionHandler = getSessionWithStorage(storage, {
+                sessionName: 'X-Session',
+                receiveSessionId: (req, sessionName) => req.getHeader(sessionName),
+                sendSessionId: (res, sessionName, sessionId) => res.setHeader(sessionName, sessionId),
+            });
+            sessionHandler.config.sendSessionId = jest.fn();
+            await sessionHandler.loadSession();
+            sessionHandler.sendSession();
+
+            const sendSessionId = sessionHandler.config.sendSessionId;
+            expect(sendSessionId).toHaveBeenCalledTimes(1);
+            expect(sendSessionId).toHaveBeenCalledWith(expect.anything(), 'X-Session', 'long-session-id');
         });
     });
 });
