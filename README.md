@@ -8,13 +8,13 @@ auzy is a Node.js middleware library to add sessions support into your web proje
 
 auzy project was made to be simple. The reason why I started it is a complexity of alternative popular middleware. I follow next principles writing this project:
 
-- Modern ES6 features
-- Promise and async/await ready
+- Use modern ES6 features
+- Promise and async/await compatible
 - Be as simple as possible
-- Compatibility with any middleware based framework (e.g. Express, Restify)
-- Flexibility for adding any session backend storages (e.g. Redis, MongoDB)
+- Provide compatibility with any middleware based framework (e.g. Express, Restify)
+- Flexibility for using any session backend storage (e.g. Redis, MongoDB)
 - Well documented (not ready yet)
-- Covered with unit-test (not ready yet)
+- Covered with unit-test (partially done)
 
 ## Available storages
 
@@ -22,7 +22,7 @@ auzy project was made to be simple. The reason why I started it is a complexity 
 
 ## Quick start
 
-Install auzy and session storage for it
+Install auzy and session storage (Redis in this example)
 
 ```bash
 npm install --save auzy auzy-storage-redis
@@ -30,17 +30,31 @@ npm install --save auzy auzy-storage-redis
 yarn add auzy auzy-storage-redis
 ```
 
-Add middleware into your project
+Add the middleware into your project
 
 ```js
 const auzyConfig = {
     session: {
+        // Session name will appear as request and response header name below.
         sessionName: 'X-Session-Token',
+
+        // TTL is specified in milliseconds and means the session expiration time.
         ttl: 60 * 60 * 24 * 30 * 6,
+
+        // Contains logic to fetch session ID from request object.
+        // Expected return value is string.
         receiveSessionId: (req, sessionName) => req.header(sessionName),
+
+        // Contains logic to send session ID to client via response object.
+        // There is no any value expected here.
         sendSessionId: (res, sessionName, sessionId) => res.header(sessionName, sessionId),
+
+        // Contains logic to fetch user data from database.
+        // Promise is expected as return value, it should resolve user data.
+        // Resolved user data will be set as req.user for current request.
         loadUser: (sessionData) => {
-            return User.Model.findOne({_id: new ObjectId(sessionData.userId)}).exec();
+            const query = {_id: new ObjectId(sessionData.userId)};
+            return User.Model.findOne().exec();
         }
     },
 };
@@ -49,7 +63,7 @@ app.use(auzy(auzyConfig, 'redis'));
 
 ### Login
 
-Use middleware inside login route
+Use middleware inside your login route
 
 ```js
 async (req, res, next) => {
