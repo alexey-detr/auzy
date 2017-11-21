@@ -1,7 +1,7 @@
 'use strict';
 
 const SessionRequestHandler = require('../SessionRequestHandler');
-const StorageStub = require('./stubs/StorageStub');
+const StorageMock = require('./mocks/StorageMock');
 const getSessionWithStorage = (storage, config) => {
     const req = {
         getHeader() {
@@ -12,6 +12,7 @@ const getSessionWithStorage = (storage, config) => {
         setHeader() {
         },
     };
+    storage = storage || new StorageMock();
     return new SessionRequestHandler(req, res, storage, config);
 };
 
@@ -37,15 +38,21 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.config.prop).toEqual(true);
         });
 
-        it('should init sessionId as null', () => {
+        it('should init sessionId as undefined value', () => {
             const sessionHandler = new SessionRequestHandler();
-            expect(sessionHandler.sessionId).toEqual(null);
+            expect(sessionHandler.sessionId).toBeUndefined();
         });
 
         it('should init sessionData as empty object', () => {
             const sessionHandler = new SessionRequestHandler();
-            expect(sessionHandler.sessionData).toMatchObject({});
+            expect(Object.keys(sessionHandler.sessionData)).toHaveLength(0);
             expect(sessionHandler.sessionData).toBeInstanceOf(Object);
+        });
+
+        it('should init config as empty object if not specified', () => {
+            const sessionHandler = new SessionRequestHandler();
+            expect(Object.keys(sessionHandler.config)).toHaveLength(0);
+            expect(sessionHandler.config).toBeInstanceOf(Object);
         });
 
         describe('configuration', () => {
@@ -56,12 +63,11 @@ describe('SessionRequestHandler', () => {
         });
     });
 
-    describe('loading session', () => {
+    describe('load session', () => {
         it('should receive sessionId from request if receiveSessionId function specified', async () => {
-            const storage = new StorageStub();
+            const storage = new StorageMock();
             storage.get = jest.fn();
             const sessionHandler = getSessionWithStorage(storage, {
-                sessionName: 'X-Session',
                 receiveSessionId: (req, sessionName) => req.getHeader(sessionName),
             });
             await sessionHandler.loadSession();
@@ -71,7 +77,7 @@ describe('SessionRequestHandler', () => {
         });
 
         it('should send sessionId to client in response if sendSessionId function specified', async () => {
-            const storage = new StorageStub();
+            const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage, {
                 sessionName: 'X-Session',
                 receiveSessionId: (req, sessionName) => req.getHeader(sessionName),
@@ -84,6 +90,88 @@ describe('SessionRequestHandler', () => {
             const sendSessionId = sessionHandler.config.sendSessionId;
             expect(sendSessionId).toHaveBeenCalledTimes(1);
             expect(sendSessionId).toHaveBeenCalledWith(expect.anything(), 'X-Session', 'long-session-id');
+        });
+
+        it("should generate new session ID as UUID if it wasn't received in the request", async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage, {
+                sessionName: 'X-Session',
+                receiveSessionId: () => {},
+            });
+            expect(sessionHandler.sessionId).toBeUndefined();
+            await sessionHandler.loadSession();
+            expect(sessionHandler.sessionId).toMatch(/[a-z0-9\-]+/);
+        });
+
+        it('should send session ID in response if alwaysSend config is set', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage, {
+                alwaysSend: true,
+            });
+            sessionHandler.sendSession = jest.fn();
+            await sessionHandler.loadSession();
+
+            expect(sessionHandler.sendSession).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('authenticate', () => {
+        it('should accept sessionData', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage);
+            await sessionHandler.authenticate({a: 1});
+
+            expect(sessionHandler.sessionData).toHaveProperty('a');
+        });
+
+        it('should call saveSession', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.saveSession = jest.fn();
+            await sessionHandler.authenticate({});
+
+            expect(sessionHandler.saveSession).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('destroy', () => {
+        it('should call del storage method with sessionId argument', async () => {
+            const storage = new StorageMock();
+            storage.del = jest.fn();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.sessionId = '123abc';
+
+            await sessionHandler.destroy();
+            expect(storage.del).toHaveBeenCalledTimes(1);
+            expect(storage.del).toHaveBeenCalledWith('123abc');
+        });
+
+        it('should set sessionData as empty object', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.sessionData = {a: 1};
+
+            await sessionHandler.destroy();
+            expect(Object.keys(sessionHandler.sessionData)).toHaveLength(0);
+            expect(sessionHandler.sessionData).toBeInstanceOf(Object);
+        });
+
+        it('should delete sessionId from session', async () => {
+            const sessionHandler = getSessionWithStorage();
+            sessionHandler.sessionId = '123abc';
+
+            await sessionHandler.destroy();
+            expect(sessionHandler.sessionId).toBeUndefined();
+        });
+
+        it('should not call del storage method if sessionId is undefined', async () => {
+            const storage = new StorageMock();
+            storage.del = jest.fn();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.sessionId = undefined;
+
+            await sessionHandler.destroy();
+            expect(storage.del).toHaveBeenCalledTimes(0);
         });
     });
 });

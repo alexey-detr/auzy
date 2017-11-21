@@ -13,8 +13,7 @@ module.exports = class SessionRequestHandler {
         this.req = req;
         this.res = res;
         this.storage = storage;
-        this.config = config;
-        this.sessionId = null;
+        this.config = config || {};
         this.sessionData = {};
     }
 
@@ -58,9 +57,12 @@ module.exports = class SessionRequestHandler {
     }
 
     destroy() {
+        this.sessionData = {};
         if (!this.sessionId) {
             return Promise.resolve();
         }
-        return this.storage.del(this.sessionId);
+        const sessionId = this.sessionId;
+        delete this.sessionId;
+        return this.storage.del(sessionId);
     }
 };

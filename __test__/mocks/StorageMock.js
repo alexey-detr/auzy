@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = class StorageStub {
+module.exports = class StorageMock {
     get(key) {
         return Promise.resolve();
     }
