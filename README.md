@@ -2,19 +2,19 @@
 
 [![Build Status](https://travis-ci.org/alexey-detr/auzy.svg?branch=master)](https://travis-ci.org/alexey-detr/auzy) [![Maintainability](https://api.codeclimate.com/v1/badges/dc7769e214a244cb68aa/maintainability)](https://codeclimate.com/github/alexey-detr/auzy/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/dc7769e214a244cb68aa/test_coverage)](https://codeclimate.com/github/alexey-detr/auzy/test_coverage)
 
-Don't ever be confused when adding authentication middleware into your project!
+Don't ever be confused when adding session middleware into your project!
 
-auzy is a Node.js middleware library to add sessions support into your web project.
+**auzy** is a Node.js middleware library to add sessions support into your web project.
 
-auzy project was made to be simple. The reason why I started it is a complexity of alternative popular middleware. I follow next principles writing this project:
+## Project features
 
-- Use modern ES6 features
+- Modern ES6 syntax
 - Promise and async/await compatible
-- Be as simple as possible
 - Provide compatibility with any middleware based framework (e.g. Express, Restify)
-- Flexibility for using any session backend storage (e.g. Redis, MongoDB)
+- Flexibility for using any session storage (e.g. Redis, MongoDB)
 - Well documented (not ready yet)
 - Covered with unit-test (partially done)
+- Be as simple as possible
 
 ## Available storages
 
