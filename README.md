@@ -4,17 +4,19 @@
 
 Don't ever be confused when adding session middleware into your project!
 
-**auzy** is a Node.js middleware library to add sessions support into your web project.
-
 ## Project features
 
 - Modern ES6 syntax
-- Promise and async/await compatible
-- Provide compatibility with any middleware based framework (e.g. Express, Restify)
+- Promise and async/await ready
+- Compatible with any middleware based framework (e.g. Express, Restify)
 - Flexibility for using any session storage (e.g. Redis, MongoDB)
 - Well documented (not ready yet)
 - Covered with unit-test (partially done)
 - Be as simple as possible
+
+It's all about **auzy**. A Node.js middleware library to add sessions support.
+
+**The project state is unstable, please be careful when using it.**
 
 ## Available storages
 
@@ -38,15 +40,15 @@ const auzyConfig = {
         // Session name will appear as request and response header name below.
         sessionName: 'X-Session-Token',
 
-        // TTL is specified in milliseconds and means the session expiration time.
+        // TTL is specified in seconds and means the session expiration time.
         ttl: 60 * 60 * 24 * 30 * 6,
 
         // Contains logic to fetch session ID from request object.
-        // Expected return value is string.
+        // String with session ID must be returned.
         receiveSessionId: (req, sessionName) => req.header(sessionName),
 
         // Contains logic to send session ID to client via response object.
-        // There is no any value expected here.
+        // There is no any return value expected here, arrow function is just for shortness.
         sendSessionId: (res, sessionName, sessionId) => res.header(sessionName, sessionId),
 
         // Contains logic to fetch user data from database.
@@ -63,7 +65,7 @@ app.use(auzy(auzyConfig, 'redis'));
 
 ### Login
 
-Use middleware inside your login route
+Use session inside your login route
 
 ```js
 async (req, res, next) => {
@@ -80,3 +82,7 @@ async (req, res, next) => {
     res.send({user: req.user.name});
 }
 ```
+
+### Logout
+
+
