@@ -59,6 +59,7 @@ module.exports = class SessionRequestHandler {
 
     destroy() {
         this.sessionData = {};
+        delete this.req.user;
         if (!this.sessionId) {
             return Promise.resolve();
         }

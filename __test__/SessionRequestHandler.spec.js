@@ -230,6 +230,14 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.sessionId).toBeUndefined();
         });
 
+        it('should delete user from req', async () => {
+            const sessionHandler = getSessionWithStorage();
+            sessionHandler.req.user = {id: 123};
+
+            await sessionHandler.destroy();
+            expect(sessionHandler.req.user).toBeUndefined();
+        });
+
         it('should not call del storage method if sessionId is undefined', async () => {
             const storage = new StorageMock();
             storage.del = jest.fn();
