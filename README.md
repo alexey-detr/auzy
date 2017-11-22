@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/alexey-detr/auzy.svg?branch=master)](https://travis-ci.org/alexey-detr/auzy) [![Maintainability](https://api.codeclimate.com/v1/badges/dc7769e214a244cb68aa/maintainability)](https://codeclimate.com/github/alexey-detr/auzy/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/dc7769e214a244cb68aa/test_coverage)](https://codeclimate.com/github/alexey-detr/auzy/test_coverage)
 
-Don't ever be confused when adding session middleware into your project!
+Don't ever get confused when adding session middleware into your project!
 
 ## Project features
 
@@ -10,13 +10,13 @@ Don't ever be confused when adding session middleware into your project!
 - Promise and async/await ready
 - Compatible with any middleware based framework (e.g. Express, Restify)
 - Flexibility for using any session storage (e.g. Redis, MongoDB)
-- Well documented (not ready yet)
-- Covered with unit-test (partially done)
-- Be as simple as possible
+- Well documented (WIP)
+- Covered with unit-test (WIP)
+- As simple as possible
 
-It's all about **auzy**. A Node.js middleware library to add sessions support.
+It's all about **auzy**. The Node.js middleware library made to add sessions support.
 
-**The project state is unstable, please be careful when using it.**
+**The current project state is unstable, please be careful using it.**
 
 ## Available storages
 
@@ -85,4 +85,39 @@ async (req, res, next) => {
 
 ### Logout
 
+To logout and destroy current session you just have to call `destroy()` method
 
+```js
+async (req, res, next) => {
+    const user = req.user;
+    if (user) {
+        await req.session.destroy();
+    }
+    res.send({user: null});
+}
+```
+
+## Configuration
+
+There two things in auzy you can to configure:
+
+- Storage
+- Session handler
+
+To configure a storage you should see the storage repository you are using.
+This repo is responsible for session configuration.
+
+- `receiveSessionId`: function → string
+- `sendSessionId`: function
+- `sessionName`: string
+- `loadUser`: function → promise(object)
+- `generateSessionId`: function → string
+- `TTL`: number
+- `alwaysSave`: boolean
+- `alwaysSend`: boolean
+
+## TODOs and ideas
+
+- [ ] Framework adapters for setting and getting headers ([Restify](http://restify.com/), [Express](http://expressjs.com/), [koa.js](http://koajs.com/), [Locomotive](http://www.locomotivejs.org))
+- [ ] Various transports or ways to get / pass session IDs from / to client (header, cookie, body?)
+- [ ] Authenticators support to validate credentials (e.g. email password pairs, any kind of tokens) with hashes or other verifiers. In other words it will provide easy to use Facebook login for example.
