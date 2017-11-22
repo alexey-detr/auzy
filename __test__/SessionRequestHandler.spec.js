@@ -92,18 +92,32 @@ describe('SessionRequestHandler', () => {
             expect(sendSessionId).toHaveBeenCalledWith(expect.anything(), 'X-Session', 'long-session-id');
         });
 
-        it("should generate new session ID as UUID if it wasn't received in the request", async () => {
+        it('should generate new session ID as UUID if it wasn\'t received in the request', async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage, {
                 sessionName: 'X-Session',
-                receiveSessionId: () => {},
+                receiveSessionId: () => {
+                },
             });
             expect(sessionHandler.sessionId).toBeUndefined();
             await sessionHandler.loadSession();
             expect(sessionHandler.sessionId).toMatch(/[a-z0-9\-]+/);
         });
 
-        it('should send session ID in response if alwaysSend config is set', async () => {
+        it('should use custom session ID generator function if it is specified in config', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage, {
+                sessionName: 'X-Session',
+                generateSessionId: () => 'session_1',
+                receiveSessionId: () => {
+                },
+            });
+            expect(sessionHandler.sessionId).toBeUndefined();
+            await sessionHandler.loadSession();
+            expect(sessionHandler.sessionId).toEqual('session_1');
+        });
+
+        it('should send session ID in response if alwaysSend config is set to true', async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage, {
                 alwaysSend: true,
@@ -112,6 +126,38 @@ describe('SessionRequestHandler', () => {
             await sessionHandler.loadSession();
 
             expect(sessionHandler.sendSession).toHaveBeenCalledTimes(1);
+        });
+
+        it('should save session if alwaysSave config is set to true', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage, {
+                alwaysSave: true,
+            });
+            sessionHandler.saveSession = jest.fn();
+            await sessionHandler.loadSession();
+
+            expect(sessionHandler.saveSession).toHaveBeenCalledTimes(1);
+        });
+
+        it('should load user into req if loadUser function is set in config', async () => {
+            const storage = new StorageMock();
+            storage.get = jest.fn().mockImplementation(() => ({userId: 123}));
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
+            await sessionHandler.loadSession();
+
+            expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
+            expect(sessionHandler.req.user).not.toBeUndefined();
+            expect(sessionHandler.config.loadUser).resolves.toMatchObject({id: 123});
+        });
+
+        it('should set null as user into req if loadUser function is set in config but there is no session data in storage', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
+            await sessionHandler.loadSession();
+
+            expect(sessionHandler.req.user).toBeNull();
         });
     });
 
@@ -131,6 +177,26 @@ describe('SessionRequestHandler', () => {
             await sessionHandler.authenticate({});
 
             expect(sessionHandler.saveSession).toHaveBeenCalledTimes(1);
+        });
+
+        it('should call sendSession', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.sendSession = jest.fn();
+            await sessionHandler.authenticate({});
+
+            expect(sessionHandler.sendSession).toHaveBeenCalledTimes(1);
+        });
+
+        it('should load user into req if loadUser function is set in config', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
+            await sessionHandler.authenticate();
+
+            expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
+            expect(sessionHandler.req.user).not.toBeUndefined();
+            expect(sessionHandler.config.loadUser).resolves.toMatchObject({id: 123});
         });
     });
 

@@ -32,7 +32,7 @@ module.exports = class SessionRequestHandler {
             this.sessionId = this.config.receiveSessionId(this.req, this.config.sessionName);
         }
         if (!this.sessionId) {
-            this.sessionId = this.config.generateSessionId || uuidv4();
+            this.sessionId = this.config.generateSessionId ? this.config.generateSessionId() : uuidv4();
         }
         this.sessionData = await this.storage.get(this.sessionId);
         if (this.config.loadUser && this.sessionData) {
@@ -53,6 +53,7 @@ module.exports = class SessionRequestHandler {
         if (this.config.loadUser) {
             this.req.user = await this.config.loadUser(this.sessionData);
         }
+        this.sendSession();
         return this.saveSession();
     }
 
