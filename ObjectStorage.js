@@ -1,13 +1,13 @@
 'use strict';
 
-module.exports = class ObjectStorage {
+class ObjectStorage {
     constructor() {
         this.data = {};
     }
 
     set(key, value, ttl = null) {
         if (ttl) {
-            throw new Error('TTL is not supported for non-persistent object storage.');
+            return Promise.reject(new Error('TTL is not supported for non-persistent object storage.'));
         }
         this.data[key] = value;
         return Promise.resolve();
@@ -18,11 +18,9 @@ module.exports = class ObjectStorage {
     }
 
     del(key) {
-        try {
-            delete this.data[key];
-        } catch (err) {
-            return Promise.reject(err);
-        }
+        delete this.data[key];
         return Promise.resolve();
     }
-};
+}
+
+module.exports = ObjectStorage;

@@ -148,7 +148,7 @@ describe('SessionRequestHandler', () => {
 
             expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
             expect(sessionHandler.req.user).not.toBeUndefined();
-            expect(sessionHandler.config.loadUser).resolves.toMatchObject({id: 123});
+            expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
         });
 
         it('should set null as user into req if loadUser function is set in config but there is no session data in storage', async () => {
@@ -196,7 +196,7 @@ describe('SessionRequestHandler', () => {
 
             expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
             expect(sessionHandler.req.user).not.toBeUndefined();
-            expect(sessionHandler.config.loadUser).resolves.toMatchObject({id: 123});
+            expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
         });
     });
 

@@ -2,7 +2,7 @@
 
 const uuidv4 = require('uuid/v4');
 
-module.exports = class SessionRequestHandler {
+class SessionRequestHandler {
     /**
      * @param req
      * @param res
@@ -67,4 +67,6 @@ module.exports = class SessionRequestHandler {
         delete this.sessionId;
         return this.storage.del(sessionId);
     }
-};
+}
+
+module.exports = SessionRequestHandler;
