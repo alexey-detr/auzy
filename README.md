@@ -16,11 +16,15 @@ Don't ever get confused when adding session middleware into your project!
 
 It's all about **auzy**. The Node.js middleware library made to add sessions support.
 
-**The current project state is unstable, please be careful using it.**
+**The project is not production ready, please be careful using it.**
 
 ## Available storages
 
 - Redis [alexey-detr/auzy-storage-redis](https://github.com/alexey-detr/auzy-storage-redis)
+
+## Examples
+
+For usage with specific framework see [examples directory](https://github.com/alexey-detr/auzy/tree/master/examples).
 
 ## Quick start
 
@@ -40,7 +44,7 @@ const auzyConfig = {
         // Session name will appear as request and response header name below.
         sessionName: 'X-Session-Token',
 
-        // TTL is specified in seconds and means the session expiration time.
+        // TTL is the session expiration time in seconds.
         ttl: 60 * 60 * 24 * 30 * 6,
 
         // Contains logic to fetch session ID from request object.
@@ -48,7 +52,6 @@ const auzyConfig = {
         receiveSessionId: (req, sessionName) => req.header(sessionName),
 
         // Contains logic to send session ID to client via response object.
-        // There is no any return value expected here, arrow function is just for shortness.
         sendSessionId: (res, sessionName, sessionId) => res.header(sessionName, sessionId),
 
         // Contains logic to fetch user data from database.

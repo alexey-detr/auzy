@@ -53,7 +53,9 @@ class SessionRequestHandler {
         if (this.config.loadUser) {
             this.req.user = await this.config.loadUser(this.sessionData);
         }
-        this.sendSession();
+        if (!this.config.alwaysSend) {
+            this.sendSession();
+        }
         return this.saveSession();
     }
 
