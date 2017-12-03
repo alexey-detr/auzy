@@ -1,6 +1,6 @@
 {
   "name": "auzy",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Light authentication / authorization middleware",
   "main": "index.js",
   "author": "Alexey Ponomarev <xlz@ya.ru>",
@@ -13,7 +13,8 @@
     "got": "^8.0.1",
     "jest": "^21.2.1",
     "koa": "^2.4.1",
-    "restify": "^6.3.4"
+    "restify": "^6.3.4",
+    "standard-version": "^4.2.0"
   },
   "config": {
     "commitizen": {
@@ -24,7 +25,8 @@
     "uuid": "^3.1.0"
   },
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "release": "standard-version"
   },
   "jest": {
     "coveragePathIgnorePatterns": [
