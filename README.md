@@ -11,8 +11,9 @@ Don't ever get confused when adding session middleware into your project!
 - Compatible with any middleware based framework (e.g. Express, Restify)
 - Flexibility for using any session storage (e.g. Redis, MongoDB)
 - Well documented (WIP)
-- Covered with unit-test (WIP)
-- As simple as possible
+- Covered with unit tests
+- Functionally tested with [Restify](http://restify.com/), [Express](http://expressjs.com/), [koa.js](http://koajs.com/), [Connect](https://github.com/senchalabs/connect)
+- Made as simple as possible
 
 It's all about **auzy**. The Node.js middleware library made to add sessions support.
 
@@ -24,7 +25,7 @@ It's all about **auzy**. The Node.js middleware library made to add sessions sup
 
 ## Examples
 
-For usage with specific framework see [examples directory](https://github.com/alexey-detr/auzy/tree/master/examples).
+For usage with specific framework see the [examples directory](https://github.com/alexey-detr/auzy/tree/master/examples).
 
 ## Quick start
 
@@ -63,12 +64,13 @@ const auzyConfig = {
         }
     },
 };
-app.use(auzy(auzyConfig, 'redis'));
+const auzyEnvironment = {storage: 'redis'};
+app.use(auzy(auzyConfig, auzyEnvironment));
 ```
 
 ### Login
 
-Use session inside your login route
+Use session object inside your login route
 
 ```js
 async (req, res, next) => {
@@ -88,7 +90,7 @@ async (req, res, next) => {
 
 ### Logout
 
-To logout and destroy current session you just have to call `destroy()` method
+To logout and destroy current session you have to call `destroy()` method
 
 ```js
 async (req, res, next) => {
@@ -121,6 +123,6 @@ This repo is responsible for session configuration.
 
 ## TODOs and ideas
 
-- [ ] Framework adapters for setting and getting headers ([Restify](http://restify.com/), [Express](http://expressjs.com/), [koa.js](http://koajs.com/), [Locomotive](http://www.locomotivejs.org))
+- [x] Framework adapters for setting and getting headers ([Restify](http://restify.com/), [Express](http://expressjs.com/), [koa.js](http://koajs.com/), [Connect](https://github.com/senchalabs/connect))
 - [ ] Various transports or ways to get / pass session IDs from / to client (header, cookie, body?)
 - [ ] Authenticators support to validate credentials (e.g. email password pairs, any kind of tokens) with hashes or other verifiers. In other words it will provide easy to use Facebook login for example.
