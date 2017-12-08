@@ -1,19 +1,27 @@
 'use strict';
 
-const SessionRequestHandler = require('../SessionRequestHandler');
+const SessionRequestHandler = require('../lib/SessionRequestHandler');
 const StorageMock = require('./mocks/StorageMock');
 const getSessionWithStorage = (storage, config) => {
     const req = {
         getHeader() {
-            return 'long-session-id';
         },
     };
     const res = {
         setHeader() {
         },
     };
+    const adapter = {
+        getHeader() {
+            return 'long-session-id';
+        },
+        setHeader() {
+        },
+        setUser() {
+        },
+    };
     storage = storage || new StorageMock();
-    return new SessionRequestHandler(req, res, storage, config);
+    return new SessionRequestHandler(req, res, storage, adapter, config);
 };
 
 describe('SessionRequestHandler', () => {
@@ -33,8 +41,13 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.storage).toHaveProperty('set');
         });
 
+        it('should accept adapter object', () => {
+            const sessionHandler = new SessionRequestHandler(null, null, null, {setHeader: () => true});
+            expect(sessionHandler.adapter).toHaveProperty('setHeader');
+        });
+
         it('should accept config', () => {
-            const sessionHandler = new SessionRequestHandler(null, null, null, {prop: true});
+            const sessionHandler = new SessionRequestHandler(null, null, null, null, {prop: true});
             expect(sessionHandler.config.prop).toEqual(true);
         });
 
@@ -57,7 +70,7 @@ describe('SessionRequestHandler', () => {
 
         describe('configuration', () => {
             it('should accept sessionName', () => {
-                const sessionHandler = new SessionRequestHandler(null, null, null, {sessionName: 'session-name'});
+                const sessionHandler = new SessionRequestHandler(null, null, null, null, {sessionName: 'session-name'});
                 expect(sessionHandler.config.sessionName).toEqual('session-name');
             });
         });
@@ -139,11 +152,12 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.saveSession).toHaveBeenCalledTimes(1);
         });
 
-        it('should load user into req if loadUser function is set in config', async () => {
+        xit("should call adapter's setUser method if loadUser function is set in config", async () => {
             const storage = new StorageMock();
             storage.get = jest.fn().mockImplementation(() => ({userId: 123}));
             const sessionHandler = getSessionWithStorage(storage);
             sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
+            sessionHandler.adapter.setUser = jest.fn();
             await sessionHandler.loadSession();
 
             expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
@@ -151,12 +165,14 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
         });
 
-        it('should set null as user into req if loadUser function is set in config but there is no session data in storage', async () => {
+        xit("should call adapter's setUser method if loadUser function is set in config but there is no session data in storage", async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage);
             sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
+            sessionHandler.adapter.setUser = jest.fn();
             await sessionHandler.loadSession();
 
+            expect(sessionHandler.adapter.setUser).toHaveBeenCalledTimes(1);
             expect(sessionHandler.req.user).toBeNull();
         });
     });
@@ -188,14 +204,16 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.sendSession).toHaveBeenCalledTimes(1);
         });
 
-        it('should load user into req if loadUser function is set in config', async () => {
+        it("should call adapter's setUser method if loadUser function is set in config", async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage);
             sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
-            await sessionHandler.authenticate();
+            sessionHandler.adapter.setUser = jest.fn();
+            await sessionHandler.authenticate({});
 
             expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
-            expect(sessionHandler.req.user).not.toBeUndefined();
+            expect(sessionHandler.adapter.setUser).toHaveBeenCalledTimes(1);
+            expect(sessionHandler.adapter.setUser).toHaveBeenCalledWith({id: 123});
             expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
         });
     });

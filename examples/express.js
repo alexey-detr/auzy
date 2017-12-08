@@ -1,4 +1,5 @@
-const restify = require('restify');
+const express = require('express');
+const bodyParser = require('body-parser');
 const auzy = require('../index');
 
 const users = [{
@@ -24,41 +25,38 @@ const auzyConfig = {
     },
 };
 const auzyEnvironment = {
-    framework: 'restify',
+    framework: 'express',
 };
 
-const server = restify.createServer();
-server.use(restify.plugins.bodyParser());
+const server = express();
+server.use(bodyParser.json());
 server.use(auzy(auzyConfig, auzyEnvironment));
 
-server.post('/login', async (req, res, next) => {
+server.post('/login', async (req, res) => {
     const index = users.findIndex(user => user.name === req.body.name);
     if (index !== -1) {
         const user = users[index];
         await req.session.authenticate({userId: user.id});
         res.send({name: req.user.name});
     }
-    next();
 });
 
-server.get('/secret', (req, res, next) => {
+server.get('/secret', (req, res) => {
     if (req.user) {
         res.send({email: req.user.email});
     } else {
-        res.send(403, {error: 'Restricted area'});
+        res.status(403).send({error: 'Restricted area'});
     }
-    next();
 });
 
-server.post('/logout', (req, res, next) => {
+server.post('/logout', (req, res) => {
     req.session.destroy();
-    res.send(200);
-    next();
+    res.sendStatus(200);
 });
 
 const launchPromise = new Promise((resolve) => {
-    server.listen(9001, () => {
-        resolve(server);
+    const nodeServer = server.listen(9001, () => {
+        resolve(nodeServer);
     });
 });
 

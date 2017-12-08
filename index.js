@@ -1,18 +1,20 @@
 'use strict';
 
-const SessionRequestHandler = require('./SessionRequestHandler');
+const SessionRequestHandler = require('./lib/SessionRequestHandler');
 
-const defaultMiddleware = (storageObject, config) => {
+const defaultMiddleware = (storage, framework, config) => {
     return async (req, res, next) => {
-        req.session = new SessionRequestHandler(req, res, storageObject, config.session);
+        const adapter = createAdapter(framework, req, res);
+        req.session = new SessionRequestHandler(req, res, storage, adapter, config.session);
         await req.session.loadSession();
         next();
     };
 };
 
-const koaMiddleware = (storageObject, config) => {
+const koaMiddleware = (storage, framework, config) => {
     return async (ctx, next) => {
-        ctx.session = new SessionRequestHandler(ctx.request, ctx.response, storageObject, config.session);
+        const adapter = createAdapter(framework, ctx);
+        ctx.session = new SessionRequestHandler(ctx.request, ctx.response, storage, adapter, config.session);
         await ctx.session.loadSession();
         await next();
     };
@@ -20,11 +22,26 @@ const koaMiddleware = (storageObject, config) => {
 
 const frameworkMiddleware = {
     default: defaultMiddleware,
-    restify: defaultMiddleware,
-    express: defaultMiddleware,
     connect: defaultMiddleware,
+    express: defaultMiddleware,
     koa: koaMiddleware,
+    restify: defaultMiddleware,
 };
+
+const adapters = {
+    connect: require('./adapters/ConnectAdapter'),
+    express: require('./adapters/ExpressAdapter'),
+    koa: require('./adapters/KoaAdapter'),
+    restify: require('./adapters/RestifyAdapter'),
+};
+
+function createAdapter(framework, req, res) {
+    let adapter = null;
+    if (adapters[framework]) {
+        adapter = new adapters[framework](req, res);
+    }
+    return adapter;
+}
 
 module.exports = (config, {storage = null, framework = 'default'}) => {
     let storageObject;
@@ -33,16 +50,16 @@ module.exports = (config, {storage = null, framework = 'default'}) => {
         storageObject = new auzyStorage(config.storage);
     } else {
         // Object storage is a non-persistent storage for sessions
-        const ObjectStorage = require('./ObjectStorage');
+        const ObjectStorage = require('./lib/ObjectStorage');
         const objectStorage = new ObjectStorage(config.storage);
         storageObject = storage || objectStorage;
     }
 
-    if (!frameworkMiddleware[framework]) {
+    if (framework && !frameworkMiddleware[framework]) {
         const middleware = `Framework ${framework} is not supported, please specify one of ` +
             `this: ${Object.keys(frameworkMiddleware).join(', ')}`;
         throw new Error(middleware);
     }
 
-    return frameworkMiddleware[framework](storageObject, config);
+    return frameworkMiddleware[framework](storageObject, framework, config);
 };

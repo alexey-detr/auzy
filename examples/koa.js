@@ -1,4 +1,6 @@
-const restify = require('restify');
+const Koa = require('koa');
+const router = require('koa-router')();
+const koaBody = require('koa-body');
 const auzy = require('../index');
 
 const users = [{
@@ -24,41 +26,40 @@ const auzyConfig = {
     },
 };
 const auzyEnvironment = {
-    framework: 'restify',
+    framework: 'koa',
 };
 
-const server = restify.createServer();
-server.use(restify.plugins.bodyParser());
+const server = new Koa();
+server.use(koaBody());
 server.use(auzy(auzyConfig, auzyEnvironment));
 
-server.post('/login', async (req, res, next) => {
-    const index = users.findIndex(user => user.name === req.body.name);
+router.post('/login', async (ctx) => {
+    const index = users.findIndex(user => user.name === ctx.request.body.name);
     if (index !== -1) {
         const user = users[index];
-        await req.session.authenticate({userId: user.id});
-        res.send({name: req.user.name});
+        await ctx.session.authenticate({userId: user.id});
+        ctx.response.body = {name: ctx.state.user.name};
     }
-    next();
 });
 
-server.get('/secret', (req, res, next) => {
-    if (req.user) {
-        res.send({email: req.user.email});
+router.get('/secret', async (ctx) => {
+    if (ctx.state.user) {
+        ctx.response.body = {email: ctx.state.user.email};
     } else {
-        res.send(403, {error: 'Restricted area'});
+        ctx.throw(403, 'Restricted area');
     }
-    next();
 });
 
-server.post('/logout', (req, res, next) => {
-    req.session.destroy();
-    res.send(200);
-    next();
+router.post('/logout', async (ctx) => {
+    ctx.status = 200;
+    ctx.session.destroy();
 });
+
+server.use(router.routes());
 
 const launchPromise = new Promise((resolve) => {
-    server.listen(9001, () => {
-        resolve(server);
+    const nodeServer = server.listen(9001, () => {
+        resolve(nodeServer);
     });
 });
 

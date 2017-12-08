@@ -1,6 +1,6 @@
 'use strict';
 
-const ObjectStorage = require('../ObjectStorage');
+const ObjectStorage = require('../lib/ObjectStorage');
 
 describe('ObjectStorage', () => {
     describe('constructor', () => {
