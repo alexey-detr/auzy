@@ -15,12 +15,14 @@ describe('ObjectStorage', () => {
         it('should set value to data property', () => {
             const objectStorage = new ObjectStorage();
             objectStorage.set('prop', 'value');
-            expect(objectStorage.data.prop).toEqual('value');
+            expect(objectStorage.get('prop')).resolves.toEqual('value');
         });
 
-        it('should throw error if TTL was specified', () => {
+        it('should return resolved promise without value if TTL was specified', () => {
             const objectStorage = new ObjectStorage();
-            expect(objectStorage.set('prop', 'value', 10)).rejects.toBeInstanceOf(Error);
+            expect(objectStorage.set('prop', 'value', 10)).resolves.toBeUndefined();
+            expect(objectStorage.data.prop).toHaveProperty('ttl', 10);
+            expect(objectStorage.data.prop).toHaveProperty('value', 'value');
         });
 
         it('should return resolved promise without value', () => {
@@ -46,9 +48,9 @@ describe('ObjectStorage', () => {
         it('should delete value in data property', () => {
             const objectStorage = new ObjectStorage();
             objectStorage.set('prop', 'value');
-            expect(objectStorage.data.prop).toEqual('value');
+            expect(objectStorage.get('prop')).resolves.toEqual('value');
             objectStorage.del('prop');
-            expect(objectStorage.data.prop).toBeUndefined();
+            expect(objectStorage.get('prop')).resolves.toBeUndefined();
         });
 
         it('should return resolved promise without value', () => {
