@@ -1,14 +1,11 @@
 'use strict';
 
+const BaseAdapter = require('./DefaultAdapter');
+
 // http://expressjs.com/en/api.html#req.get
 // http://expressjs.com/en/api.html#res.set
 
-class ExpressAdapter {
-    constructor(req, res) {
-        this.req = req;
-        this.res = res;
-    }
-
+class ExpressAdapter extends BaseAdapter {
     setHeader(name, value) {
         this.res.set(name, value);
     }

@@ -1,14 +1,11 @@
 'use strict';
 
+const BaseAdapter = require('./DefaultAdapter');
+
 // https://nodejs.org/api/http.html#http_request_getheader_name
 // https://nodejs.org/api/http.html#http_response_setheader_name_value
 
-class ConnectAdapter {
-    constructor(req, res) {
-        this.req = req;
-        this.res = res;
-    }
-
+class ConnectAdapter extends BaseAdapter {
     setHeader(name, value) {
         this.res.setHeader(name, value);
     }

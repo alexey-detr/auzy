@@ -152,7 +152,7 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.saveSession).toHaveBeenCalledTimes(1);
         });
 
-        xit("should call adapter's setUser method if loadUser function is set in config", async () => {
+        it("should call adapter's setUser method if loadUser function is set in config", async () => {
             const storage = new StorageMock();
             storage.get = jest.fn().mockImplementation(() => ({userId: 123}));
             const sessionHandler = getSessionWithStorage(storage);
@@ -161,11 +161,11 @@ describe('SessionRequestHandler', () => {
             await sessionHandler.loadSession();
 
             expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
-            expect(sessionHandler.req.user).not.toBeUndefined();
-            expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
+            expect(sessionHandler.adapter.setUser).toHaveBeenCalledTimes(1);
+            expect(sessionHandler.adapter.setUser).toHaveBeenCalledWith({id: 123});
         });
 
-        xit("should call adapter's setUser method if loadUser function is set in config but there is no session data in storage", async () => {
+        it("should call adapter's setUser method if loadUser function is set in config but there is no session data in storage", async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage);
             sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
@@ -173,7 +173,7 @@ describe('SessionRequestHandler', () => {
             await sessionHandler.loadSession();
 
             expect(sessionHandler.adapter.setUser).toHaveBeenCalledTimes(1);
-            expect(sessionHandler.req.user).toBeNull();
+            expect(sessionHandler.adapter.setUser).toHaveBeenCalledWith(null);
         });
     });
 
@@ -214,7 +214,7 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.config.loadUser).toHaveBeenCalledTimes(1);
             expect(sessionHandler.adapter.setUser).toHaveBeenCalledTimes(1);
             expect(sessionHandler.adapter.setUser).toHaveBeenCalledWith({id: 123});
-            expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
+            await expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
         });
     });
 

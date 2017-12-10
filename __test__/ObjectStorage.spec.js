@@ -12,51 +12,51 @@ describe('ObjectStorage', () => {
     });
 
     describe('set', () => {
-        it('should set value to data property', () => {
+        it('should set value to data property', async () => {
             const objectStorage = new ObjectStorage();
             objectStorage.set('prop', 'value');
-            expect(objectStorage.get('prop')).resolves.toEqual('value');
+            await expect(objectStorage.get('prop')).resolves.toEqual('value');
         });
 
-        it('should return resolved promise without value if TTL was specified', () => {
+        it('should return resolved promise without value if TTL was specified', async () => {
             const objectStorage = new ObjectStorage();
-            expect(objectStorage.set('prop', 'value', 10)).resolves.toBeUndefined();
+            await expect(objectStorage.set('prop', 'value', 10)).resolves.toBeUndefined();
             expect(objectStorage.data.prop).toHaveProperty('ttl', 10);
             expect(objectStorage.data.prop).toHaveProperty('value', 'value');
         });
 
-        it('should return resolved promise without value', () => {
+        it('should return resolved promise without value', async () => {
             const objectStorage = new ObjectStorage();
-            expect(objectStorage.set('prop', 'value')).resolves.toBeUndefined();
+            await expect(objectStorage.set('prop', 'value')).resolves.toBeUndefined();
         });
     });
 
     describe('get', () => {
-        it('should fetch value from data property', () => {
+        it('should fetch value from data property', async () => {
             const objectStorage = new ObjectStorage();
             objectStorage.set('prop', 'value');
-            expect(objectStorage.get('prop')).resolves.toEqual('value');
+            await expect(objectStorage.get('prop')).resolves.toEqual('value');
         });
 
-        it('should return undefined if value was not found', () => {
+        it('should return undefined if value was not found', async () => {
             const objectStorage = new ObjectStorage();
-            expect(objectStorage.get('prop')).resolves.toBeUndefined();
+            await expect(objectStorage.get('prop')).resolves.toBeUndefined();
         });
     });
 
     describe('del', () => {
-        it('should delete value in data property', () => {
+        it('should delete value in data property', async () => {
             const objectStorage = new ObjectStorage();
             objectStorage.set('prop', 'value');
-            expect(objectStorage.get('prop')).resolves.toEqual('value');
+            await expect(objectStorage.get('prop')).resolves.toEqual('value');
             objectStorage.del('prop');
-            expect(objectStorage.get('prop')).resolves.toBeUndefined();
+            await expect(objectStorage.get('prop')).resolves.toBeUndefined();
         });
 
-        it('should return resolved promise without value', () => {
+        it('should return resolved promise without value', async () => {
             const objectStorage = new ObjectStorage();
             objectStorage.set('prop', 'value');
-            expect(objectStorage.del('prop')).resolves.toBeUndefined();
+            await expect(objectStorage.del('prop')).resolves.toBeUndefined();
         });
-    })
+    });
 });
