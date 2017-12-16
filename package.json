@@ -7,10 +7,13 @@
   "license": "MIT",
   "repository": "https://github.com/alexey-detr/auzy",
   "devDependencies": {
+    "@commitlint/cli": "^5.2.5",
+    "@commitlint/config-conventional": "^5.2.3",
     "connect": "^3.6.5",
     "cz-conventional-changelog": "^2.1.0",
     "express": "^4.16.2",
     "got": "^8.0.1",
+    "husky": "^0.14.3",
     "jest": "^21.2.1",
     "koa": "^2.4.1",
     "koa-body": "^2.5.0",
@@ -26,7 +29,8 @@
   "dependencies": {},
   "scripts": {
     "test": "jest --coverage",
-    "release": "standard-version"
+    "release": "standard-version",
+    "commitmsg": "commitlint -e $GIT_PARAMS"
   },
   "jest": {
     "coveragePathIgnorePatterns": [
