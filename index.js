@@ -29,10 +29,10 @@ const frameworkMiddleware = {
 };
 
 const adapters = {
-    connect: require('./adapters/ConnectAdapter'),
-    express: require('./adapters/ExpressAdapter'),
-    koa: require('./adapters/KoaAdapter'),
-    restify: require('./adapters/RestifyAdapter'),
+    connect: require('./lib/adapters/ConnectAdapter'),
+    express: require('./lib/adapters/ExpressAdapter'),
+    koa: require('./lib/adapters/KoaAdapter'),
+    restify: require('./lib/adapters/RestifyAdapter'),
 };
 
 function createAdapter(framework, req, res) {
