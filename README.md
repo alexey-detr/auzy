@@ -137,7 +137,7 @@ Property specifies how long the session data will be valid until expiration. **V
 
 If `true` the session data will be saved every time the session is loaded. Can be useful to resave the new user name if it is stored in the session data.
 
-#### `alwaysSend: string`
+#### `alwaysSend: boolean`
 
 If `true` the session ID will be send to client in the every response. If `false` the session ID will be send only when `session.authenticate()` is explicitly called.
 
