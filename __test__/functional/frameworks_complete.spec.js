@@ -57,9 +57,11 @@ describe('framework', () => {
                 const token = loginResponse.headers['x-session-token'];
 
                 // logout
-                await got.post(url + '/logout', {
+                const logoutResponse = await got.post(url + '/logout', {
                     headers: {'X-Session-Token': token},
+                    json: true,
                 });
+                expect(logoutResponse.body.user).toBeFalsy();
 
                 // secret
                 const secretPromise = got.get(url + '/secret', {

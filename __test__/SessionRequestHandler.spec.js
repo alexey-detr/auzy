@@ -19,6 +19,8 @@ const getSessionWithStorage = (storage, config) => {
         },
         setUser() {
         },
+        delUser() {
+        },
     };
     const transport = {
         sendSessionId() {
@@ -164,7 +166,7 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.saveSession).toHaveBeenCalledTimes(1);
         });
 
-        it("should call adapter's setUser method if loadUser function is set in config", async () => {
+        it('should call adapter\'s setUser method if loadUser function is set in config', async () => {
             const storage = new StorageMock();
             storage.get = jest.fn().mockImplementation(() => ({userId: 123}));
             const sessionHandler = getSessionWithStorage(storage);
@@ -177,7 +179,7 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.adapter.setUser).toHaveBeenCalledWith({id: 123});
         });
 
-        it("should call adapter's setUser method if loadUser function is set in config but there is no session data in storage", async () => {
+        it('should call adapter\'s setUser method if loadUser function is set in config but there is no session data in storage', async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage);
             sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
@@ -216,7 +218,7 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.sendSession).toHaveBeenCalledTimes(1);
         });
 
-        it("should call adapter's setUser method if loadUser function is set in config", async () => {
+        it('should call adapter\'s setUser method if loadUser function is set in config', async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage);
             sessionHandler.config.loadUser = jest.fn().mockImplementation(() => Promise.resolve({id: 123}));
@@ -260,12 +262,12 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.sessionId).toBeUndefined();
         });
 
-        it('should delete user from req', async () => {
+        it('should call adapter\'s delUser method', async () => {
             const sessionHandler = getSessionWithStorage();
-            sessionHandler.req.user = {id: 123};
+            sessionHandler.adapter.delUser = jest.fn();
 
             await sessionHandler.destroy();
-            expect(sessionHandler.req.user).toBeUndefined();
+            expect(sessionHandler.adapter.delUser).toHaveBeenCalledTimes(1);
         });
 
         it('should not call del storage method if sessionId is undefined', async () => {

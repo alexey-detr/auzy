@@ -46,9 +46,11 @@ server.get('/secret', (req, res, next) => {
     next();
 });
 
-server.post('/logout', (req, res, next) => {
-    req.session.destroy();
-    res.send(200);
+server.post('/logout', async (req, res, next) => {
+    await req.session.destroy();
+    // send the user object back just to be sure that the user is not accessible
+    // after the session was destroyed
+    res.send({user: req.user});
     next();
 });
 

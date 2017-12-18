@@ -46,9 +46,11 @@ server.use('/secret', (req, res) => {
     }
 });
 
-server.use('/logout', (req, res) => {
-    req.session.destroy();
-    res.end();
+server.use('/logout', async (req, res) => {
+    await req.session.destroy();
+    // send the user object back just to be sure that the user is not accessible
+    // after the session was destroyed
+    res.end(JSON.stringify({user: req.user}));
 });
 
 const launchPromise = new Promise((resolve) => {

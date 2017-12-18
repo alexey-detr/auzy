@@ -47,8 +47,10 @@ router.get('/secret', async (ctx) => {
 });
 
 router.post('/logout', async (ctx) => {
-    ctx.status = 200;
-    ctx.session.destroy();
+    await ctx.session.destroy();
+    // send the user object back just to be sure that the user is not accessible
+    // after the session was destroyed
+    ctx.response.body = {user: ctx.state.user};
 });
 
 server.use(router.routes());
