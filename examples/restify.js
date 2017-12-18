@@ -12,8 +12,6 @@ const auzyConfig = {
         sessionName: 'X-Session-Token',
         ttl: 60 * 60 * 24 * 30 * 6,
         alwaysSend: true,
-        receiveSessionId: (proxy, sessionName) => proxy.getHeader(sessionName),
-        sendSessionId: (proxy, sessionName, sessionId) => proxy.setHeader(sessionName, sessionId),
         loadUser: (sessionData) => {
             const index = users.findIndex(user => user.id === sessionData.userId);
             return users[index];
@@ -22,6 +20,7 @@ const auzyConfig = {
 };
 const auzyEnvironment = {
     framework: 'restify',
+    transport: 'header',
 };
 
 const server = restify.createServer();

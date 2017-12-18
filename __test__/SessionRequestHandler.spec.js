@@ -20,8 +20,15 @@ const getSessionWithStorage = (storage, config) => {
         setUser() {
         },
     };
+    const transport = {
+        sendSessionId() {
+        },
+        receiveSessionId() {
+            return 'long-session-id';
+        },
+    };
     storage = storage || new StorageMock();
-    return new SessionRequestHandler(req, res, storage, adapter, config);
+    return new SessionRequestHandler(req, res, storage, adapter, transport, config);
 };
 
 describe('SessionRequestHandler', () => {
@@ -46,8 +53,13 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.adapter).toHaveProperty('setHeader');
         });
 
+        it('should accept transport object', () => {
+            const sessionHandler = new SessionRequestHandler(null, null, null, null, {sendSessionId: () => true});
+            expect(sessionHandler.transport).toHaveProperty('sendSessionId');
+        });
+
         it('should accept config', () => {
-            const sessionHandler = new SessionRequestHandler(null, null, null, null, {prop: true});
+            const sessionHandler = new SessionRequestHandler(null, null, null, null, null, {prop: true});
             expect(sessionHandler.config.prop).toEqual(true);
         });
 
@@ -70,7 +82,7 @@ describe('SessionRequestHandler', () => {
 
         describe('configuration', () => {
             it('should accept sessionName', () => {
-                const sessionHandler = new SessionRequestHandler(null, null, null, null, {sessionName: 'session-name'});
+                const sessionHandler = new SessionRequestHandler(null, null, null, null, null, {sessionName: 'session-name'});
                 expect(sessionHandler.config.sessionName).toEqual('session-name');
             });
         });
