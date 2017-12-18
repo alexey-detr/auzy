@@ -1,6 +1,6 @@
 {
   "name": "auzy",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Light authentication / authorization middleware",
   "main": "index.js",
   "author": "Alexey Ponomarev <xlz@ya.ru>",

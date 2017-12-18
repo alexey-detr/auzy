@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/alexey-detr/auzy/compare/v2.1.0...v3.0.0) (2017-12-18)
+
+
+### Bug Fixes
+
+* fixed issue when user was not deleted from session in Koa ([ed1117e](https://github.com/alexey-detr/auzy/commit/ed1117e))
+
+
+### Features
+
+* **ObjectStorage:** Added TTL support for a native ObjectStorage ([44da244](https://github.com/alexey-detr/auzy/commit/44da244))
+* added header transport implementation ([d93d5d7](https://github.com/alexey-detr/auzy/commit/d93d5d7))
+
+
+### BREAKING CHANGES
+
+* **ObjectStorage:** TTL has to be specified in milliseconds now
+
+
+
 <a name="2.1.0"></a>
 # [2.1.0](https://github.com/alexey-detr/auzy/compare/v2.0.0...v2.1.0) (2017-12-08)
 
