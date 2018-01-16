@@ -5,16 +5,18 @@ const frameworks = [
     'connect',
 ];
 
-describe('framework', () => {
+const got = require('got');
+
+describe('framework header transport', () => {
 
     frameworks.forEach(framework => {
         describe(framework, () => {
-            const got = require('got');
             const url = 'http://localhost:9001';
             let server;
 
             beforeAll(() => {
-                return require(`../../examples/${framework}`).then((srv) => server = srv);
+                const config = require('./header')(framework);
+                return require(`../../../servers/${framework}`)(config).then((srv) => server = srv);
             });
 
             afterAll(() => {

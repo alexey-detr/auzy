@@ -214,3 +214,4 @@ app.use(auzy(auzyConfig, auzyEnvironment));
 - [ ] Various transports or ways to get / pass session IDs from / to client (header, cookie, body?)
 - [ ] MongoDB session storage
 - [ ] Authenticators support to validate credentials (e.g. email password pairs, any kind of tokens) with hashes or other verifiers. In other words it will provide easy to use Facebook login for example.
+- [ ] Made project ready to support things like JWT which use client as a session storage.
