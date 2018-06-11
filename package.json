@@ -1,6 +1,6 @@
 {
   "name": "auzy",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Easy to use session middleware",
   "main": "index.js",
   "author": "Alexey Ponomarev <xlz@ya.ru>",

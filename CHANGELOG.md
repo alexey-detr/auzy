@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/alexey-detr/auzy/compare/v3.0.0...v4.0.0) (2018-06-11)
+
+
+### Bug Fixes
+
+* Fixed authenticate() method to always send sessionId ([620edcb](https://github.com/alexey-detr/auzy/commit/620edcb))
+
+
+### Features
+
+* Session ID will be regenerated on every authenticate() call ([00d7a60](https://github.com/alexey-detr/auzy/commit/00d7a60))
+
+
+### BREAKING CHANGES
+
+* Calling of authenticate() method will now regenerate a session ID
+
+
+
 <a name="3.0.0"></a>
 # [3.0.0](https://github.com/alexey-detr/auzy/compare/v2.1.0...v3.0.0) (2017-12-18)
 
