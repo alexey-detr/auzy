@@ -119,7 +119,7 @@ describe('SessionRequestHandler', () => {
             expect(sendSessionId).toHaveBeenCalledWith(expect.anything(), 'X-Session', 'long-session-id');
         });
 
-        it('should generate new session ID as UUID if it wasn\'t received in the request', async () => {
+        it('should generate new session ID if it wasn\'t received in the request', async () => {
             const storage = new StorageMock();
             const sessionHandler = getSessionWithStorage(storage, {
                 sessionName: 'X-Session',
@@ -230,6 +230,15 @@ describe('SessionRequestHandler', () => {
             expect(sessionHandler.adapter.setUser).toHaveBeenCalledWith({id: 123});
             await expect(sessionHandler.config.loadUser()).resolves.toMatchObject({id: 123});
         });
+
+        it('should generate a new session ID with at least 10 bytes length', async () => {
+            const storage = new StorageMock();
+            const sessionHandler = getSessionWithStorage(storage);
+            sessionHandler.sessionId = 'abc';
+
+            await sessionHandler.authenticate({});
+            expect(sessionHandler.sessionId).toMatch(/^[a-zA-Z0-9+=/]{10,}$/);
+        })
     });
 
     describe('destroy', () => {
